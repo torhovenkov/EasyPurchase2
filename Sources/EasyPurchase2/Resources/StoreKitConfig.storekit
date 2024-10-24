@@ -1,0 +1,189 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "C33C2D24",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "15.99",
+      "familyShareable" : false,
+      "internalID" : "7BE57DBB",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "lifetime",
+      "referenceName" : "Lifetime",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "080A22C4",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "100 points",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "points.100",
+      "referenceName" : "100 Points",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "70866911",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "500 points",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "points.500",
+      "referenceName" : "500 Points",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "28C7955B",
+      "localizations" : [
+
+      ],
+      "name" : "group1",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "3.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "215E1E25",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "sub.1 for 3.99",
+              "displayName" : "Subscribtion1",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "sub.1",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Subscribtion1",
+          "subscriptionGroupID" : "28C7955B",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "692600B5",
+          "introductoryOffer" : {
+            "displayPrice" : "0.99",
+            "internalID" : "BAD36BE2",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "sub.2 for 9.99",
+              "displayName" : "Subscribtion2",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "sub.2",
+          "recurringSubscriptionPeriod" : "P3M",
+          "referenceName" : "Subscribtion2",
+          "subscriptionGroupID" : "28C7955B",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
