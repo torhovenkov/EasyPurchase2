@@ -9,41 +9,41 @@ import Foundation
 import StoreKit
 
 public struct Offer: Hashable {
-    let product: Product
+    public let product: Product
     
-    init(product: Product) {
+    public init(product: Product) {
         self.product = product
     }
     
-    var id: String { product.id }
+    public var id: String { product.id }
     
-    var displayName: String { product.displayName }
+    public var displayName: String { product.displayName }
     
-    var displayPrice: String { product.displayPrice }
+    public var displayPrice: String { product.displayPrice }
     
-    var price: Decimal { product.price }
+    public var price: Decimal { product.price }
     
-    var subscribtionPeriod: Product.SubscriptionPeriod? {
+    public var subscribtionPeriod: Product.SubscriptionPeriod? {
         product.subscription?.subscriptionPeriod
     }
     
-    var subscribtionPeriodFormatted: String? {
+    public var subscribtionPeriodFormatted: String? {
         getFormattedPeriod(for: subscribtionPeriod)
     }
     
-    var subscribtionOfferPeriod: Product.SubscriptionPeriod? {
+    public var subscribtionOfferPeriod: Product.SubscriptionPeriod? {
         product.subscription?.introductoryOffer?.period
     }
     
-    var subscribtionOfferPeriodFormatted: String? {
+    public var subscribtionOfferPeriodFormatted: String? {
         getFormattedPeriod(for: subscribtionOfferPeriod)
     }
     
-    var offerPrice: String? {
+    public var offerPrice: String? {
         product.subscription?.introductoryOffer?.displayPrice
     }
     
-    var priceInDouble: Double {
+    public var priceInDouble: Double {
         Double(truncating: product.price as NSNumber)
     }
     
@@ -65,7 +65,7 @@ public struct Offer: Hashable {
         return duration * days
     }
     
-    func discount(to baseOffer: Offer) -> Int? {
+    public func discount(to baseOffer: Offer) -> Int? {
         guard let baseOfferDays = baseOffer.days,
               let selfDays = self.days
         else {
