@@ -30,7 +30,7 @@ final class PurchaseService: ObservableObject {
         easyPurchase = EasyPurchase2.shared
         
         Task {
-            await easyPurchase.configureWithoutATT(appStoreId: "", productIds: productIds, requestTrackerPermissionOnStart: false)
+            await easyPurchase.configure(appStoreId: "", productIds: productIds, requestTrackerPermissionOnStart: false)
             
             easyPurchase.$renewableSubscribtions
                 .assign(to: &$subscribtions)

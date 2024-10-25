@@ -45,7 +45,5 @@ final class ExampleViewVM: ObservableObject {
         selectedOffer == offer
     }
     
-    func purchase() {
-        guard let selectedOffer else { return }
-    }
+    func purchase() { }
 }

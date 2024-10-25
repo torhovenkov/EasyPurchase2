@@ -46,18 +46,12 @@ public final class EasyPurchase2: ObservableObject {
         isTrackerConfigured = true
     }
     
-    func configureWithoutATT() async {
-        guard !isTrackerConfigured else { return }
-        await tracker.configureWithoutATT(with: appStoreId, allProducts: allProducts)
-        isTrackerConfigured = true
-    }
-    
     deinit {
         updateListenerTask?.cancel()
     }
     
-    public func purchase(_ appProduct: Offer) async throws -> Transaction? {
-        let result = try await appProduct.product.purchase()
+    public func purchase(_ offer: Offer) async throws -> Transaction? {
+        let result = try await offer.product.purchase()
         
         switch result {
         case .success(let verification):
@@ -77,7 +71,6 @@ public final class EasyPurchase2: ObservableObject {
         try await AppStore.sync()
     }
     
-    @MainActor
     private func requestProducts() async {
         do {
             allProducts = try await Product.products(for: productIds)
@@ -107,7 +100,6 @@ public final class EasyPurchase2: ObservableObject {
         }
     }
     
-    @MainActor
     private func updateCustomerProductStatus() async {
         var allPurchased: Set<Transaction> = []
         var purchasedSubscriptions: Set<Offer> = []
@@ -172,21 +164,6 @@ extension EasyPurchase2 {
             switch self {
             case .failedVerification: "Cannot verify purchase"
             }
-        }
-    }
-}
-
-extension EasyPurchase2 {
-    func configureWithoutATT(appStoreId: String, productIds: [String], requestTrackerPermissionOnStart: Bool) async {
-        self.productIds = productIds
-        self.appStoreId = appStoreId
-        
-        await requestProducts()
-        
-        await updateCustomerProductStatus()
-        
-        if requestTrackerPermissionOnStart {
-            await configureWithoutATT()
         }
     }
 }
