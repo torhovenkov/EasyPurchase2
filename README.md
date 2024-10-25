@@ -16,6 +16,7 @@ EasyPurchase is a Swift package that simplifies the implementation of purchase l
 - `requestTrackerPermission() async`: Request tracker permission if you don't hasn't requested it in configure function
 - `restorePurchase() async`: Restore a previous purchase.
 - `purchase(_ offer: Offer) async throws -> Transaction? `: Initiate a purchase for a specific offer.
+- `findOffer(by id: String) -> Offer?`: find first offer by id among all fetched offers
 
 ## Getting Started
 

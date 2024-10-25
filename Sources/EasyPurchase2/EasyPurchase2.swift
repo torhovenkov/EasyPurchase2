@@ -50,6 +50,14 @@ public final class EasyPurchase2: ObservableObject {
         updateListenerTask?.cancel()
     }
     
+    public func findOffer(by id: String) -> Offer? {
+        if let product = allProducts.first(where: { $0.id == id }) {
+            return Offer(product: product)
+        }
+        
+        return nil
+    }
+    
     public func purchase(_ offer: Offer) async throws -> Transaction? {
         let result = try await offer.product.purchase()
         
