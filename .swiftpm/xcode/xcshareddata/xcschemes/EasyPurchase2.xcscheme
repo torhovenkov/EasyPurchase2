@@ -41,7 +41,7 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <StoreKitConfigurationFileReference
-         identifier = "../../../Sources/EasyPurchase2/Resources/StoreKitConfig.storekit">
+         identifier = "../../../Sources/EasyPurchase2/Resources/EasyPurchase2_StoreKitConfig.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
