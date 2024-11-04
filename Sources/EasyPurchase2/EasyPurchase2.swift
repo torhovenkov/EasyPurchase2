@@ -8,6 +8,7 @@ import StoreKit
 public final class EasyPurchase2: ObservableObject {
     public static var shared = EasyPurchase2()
     
+    @Published public private(set) var isFetched: Bool = false
     @Published public private(set) var consumables: [Offer] = []
     @Published public private(set) var nonConsumables: [Offer] = []
     @Published public private(set) var renewableSubscribtions: [Offer] = []
@@ -152,6 +153,10 @@ public final class EasyPurchase2: ObservableObject {
                 } catch {
                     print("--EasyPurchase2--","Transaction failed verification with error:", error.localizedDescription)
                 }
+            }
+            
+            Task { @MainActor [weak self] in
+                self?.isFetched = true
             }
         }
     }
