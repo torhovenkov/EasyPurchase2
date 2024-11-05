@@ -138,6 +138,8 @@ public final class EasyPurchase2: ObservableObject {
         self.purchasedNonConsumables = purchasedNonConsumables
         self.purchasedSubscriptions = purchasedSubscriptions
         
+        isFetched = true
+        
         await tracker.updatePurchases(of: allPurchased)
     }
     
@@ -153,10 +155,6 @@ public final class EasyPurchase2: ObservableObject {
                 } catch {
                     print("--EasyPurchase2--","Transaction failed verification with error:", error.localizedDescription)
                 }
-            }
-            
-            Task { @MainActor [weak self] in
-                self?.isFetched = true
             }
         }
     }
