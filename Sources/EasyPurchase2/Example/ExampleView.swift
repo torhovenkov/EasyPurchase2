@@ -5,6 +5,7 @@
 //  Created by Vladyslav Torhovenkov on 22.10.2024.
 //
 
+#if !os(macOS)
 import SwiftUI
 
 struct ExampleView: View {
@@ -74,3 +75,4 @@ struct ExampleView: View {
 #Preview {
     ExampleView()
 }
+#endif
