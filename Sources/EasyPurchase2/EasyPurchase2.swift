@@ -3,6 +3,7 @@
 
 import Foundation
 import StoreKit
+import os
 
 @MainActor
 public final class EasyPurchase2: ObservableObject {
@@ -22,9 +23,11 @@ public final class EasyPurchase2: ObservableObject {
     private var isTrackerConfigured: Bool = false
     private var appStoreId: String = ""
     
+    private let logger = Logger(subsystem: "com.torhovenkov.EasyPurchase2", category: "StoreKit")
     private let tracker = Tracker.shared
     
     private init() {
+        logger.info("EasyPurchase2.init")
         updateListenerTask = listenForTransactions()
     }
     
@@ -81,6 +84,7 @@ public final class EasyPurchase2: ObservableObject {
     }
     
     private func requestProducts() async {
+        logger.info("requesting products")
         do {
             allProducts = try await Product.products(for: productIds)
             
@@ -97,15 +101,21 @@ public final class EasyPurchase2: ObservableObject {
                 case .nonConsumable:
                     nonConsumables.append(product)
                 default:
-                    print("--EasyPurchase2--","Unknown product:", product.id)
+                    logger.warning("Unknown product: \(product.id)")
                 }
             }
             
             self.consumables = consumables.map(Offer.init)
             self.nonConsumables = nonConsumables.map(Offer.init)
             self.renewableSubscribtions = subscriptions.map(Offer.init)
+            
+            if allProducts.isEmpty {
+                logger.warning("requested products are empty")
+            } else {
+                logger.info("requestProducts success")
+            }
         } catch {
-            print("--EasyPurchase2--","Failed product request from the App Store server. \(error)")
+            logger.error("Failed product request from the App Store server. \(error)")
         }
     }
     
@@ -131,9 +141,11 @@ public final class EasyPurchase2: ObservableObject {
                 default: break
                 }
             } catch {
-                print("--EasyPurchase2--",error)
+                logger.error("Failed \(#function) message: \(error)")
             }
         }
+        
+        logger.info("purchasedNonConsumables.count: \(purchasedNonConsumables.count), purchasedSubscriptions.count: \(purchasedSubscriptions.count)")
         
         self.purchasedNonConsumables = purchasedNonConsumables
         self.purchasedSubscriptions = purchasedSubscriptions
@@ -153,7 +165,7 @@ public final class EasyPurchase2: ObservableObject {
                     
                     await transaction.finish()
                 } catch {
-                    print("--EasyPurchase2--","Transaction failed verification with error:", error.localizedDescription)
+                    self.logger.error("Transaction failed verification with error: \(error)")
                 }
             }
         }

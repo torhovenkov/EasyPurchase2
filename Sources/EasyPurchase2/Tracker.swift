@@ -11,6 +11,7 @@ import AppTrackingTransparency
 import AdSupport
 import Network
 import StoreKit
+import os
 
 #if !os(tvOS)
 import AdServices
@@ -37,7 +38,11 @@ actor Tracker: TrackServiceProtocol {
     private var didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
 #endif
     
+    static let logger = Logger(subsystem: "com.torhovenkov.EasyPurchase2", category: "Tracker")
+    
     private init() { }
+    
+    private var logger: Logger { Self.logger }
     
     func configure(with appstoreId: String, allProducts: [Product]) async {
         self.allProducts = allProducts
@@ -107,10 +112,10 @@ actor Tracker: TrackServiceProtocol {
     
     func updatePurchases(of transactions: Set<Transaction>) async {
         let isFirstRun: Bool = Storage.getFromDefaults(.isFirstRun) ?? true
-        print("!@ANALITIC Old Purchases prepeare: \(isFirstRun)")
+        logger.log("Purchases prepeare, isFirstRun:\(isFirstRun)")
         guard isFirstRun else { return }
         Storage.saveInDefaults(false, by: .isFirstRun)
-        print("!@ANALITIC Old Purchases start")
+        logger.log("Purchases start")
         
         let productDetails = transactions.compactMap { transaction in
             if let product = product(by: transaction.productID) {
@@ -126,29 +131,44 @@ actor Tracker: TrackServiceProtocol {
     func product(by productId: String) -> Product? {
         allProducts.first(where: { $0.id == productId })
     }
-}
-
-private func handleAttribution() async -> UserAttribution? {
+    
+    private func handleAttribution() async -> UserAttribution? {
 #if targetEnvironment(simulator) || os(tvOS)
-    return nil
+        return nil
 #endif
-    
-    let attributionToken = try? AAAttribution.attributionToken()
-    guard let attributionToken else { return nil }
-    
-    var request = URLRequest(url: URL(string:"https://api-adservices.apple.com/api/v1/")!)
-    request.httpMethod = "POST"
-    request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-    request.httpBody = Data(attributionToken.utf8)
-    
-    guard let (data, _) = try? await URLSession.shared.data(for: request),
-       let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:Any],
-       let attribution = result["attribution"] as? Bool,
-       let campaignId = result["campaignId"] as? Int,
-       let countryOrRegion = result["countryOrRegion"] as? String,
-          campaignId != 1234567890 else { return nil }
-    
-    return UserAttribution(attrubution: attribution, campaignId: String(campaignId), campaignRegion: countryOrRegion)
+        
+        let attributionToken = try? AAAttribution.attributionToken()
+        guard let attributionToken else { return nil }
+        
+        var request = URLRequest(url: URL(string:"https://api-adservices.apple.com/api/v1/")!)
+        request.httpMethod = "POST"
+        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data(attributionToken.utf8)
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            guard let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:Any],
+                  let attribution = result["attribution"] as? Bool,
+                  let campaignId = result["campaignId"] as? Int,
+                  let countryOrRegion = result["countryOrRegion"] as? String else {
+                logger.error("\(#function) downcasting error")
+                let stringData = String(data: data, encoding: .utf8)
+                logger.error("\(#function) data: \(stringData ?? "nil")")
+                
+                return nil
+            }
+            
+            guard campaignId != 1234567890 else {
+                logger.error("\(#function) campaignId == 1234567890)")
+                return nil
+            }
+            
+            return UserAttribution(attrubution: attribution, campaignId: String(campaignId), campaignRegion: countryOrRegion)
+        } catch {
+            logger.error("\(#function), error: \(error)")
+            return nil
+        }
+    }
 }
 
 // MARK: - Helpers

@@ -7,6 +7,7 @@
 
 
 import Foundation
+import os
 
 enum NetworkErrors: Error {
     case badUrl
@@ -29,7 +30,7 @@ enum NetworkService {
     
     static func send<T: DictionaryConvertable>(_ data: T, endpoint: TrackerEndpoint) {
         guard let url = baseUrl?.appendingPathComponent(endpoint.path) else {
-            print("!@ANALITIC ERROR in \(endpoint.rawValue): BadURL")
+            logger.error("NetworkService, \(#function), endpoint: \(endpoint.rawValue): BadURL")
             return
         }
         
@@ -43,26 +44,30 @@ enum NetworkService {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             
             if let string = String(data: jsonData, encoding: .utf8) {
-                print("!@ANALITIC \(endpoint.rawValue) data:\n \(string.utf8)")
+                logger.info("NetworkService, \(#function) data:\n\(string.utf8)")
             }
             
             let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
                 if let error = error {
-                    print("!@ANALITIC ERROR in \(endpoint.rawValue): \(error.localizedDescription)")
+                    logger.error("NetworkService, \(#function), dataTask returns error in \(endpoint.rawValue):\n\(error.localizedDescription)")
                 }
                 
                 if let httpResponse = response as? HTTPURLResponse {
                     let statusCode = httpResponse.statusCode
-                    print("!@ANALITIC \(endpoint.rawValue) status code: \(statusCode)")
+                    logger.info("NetworkService, \(#function), \(endpoint.rawValue) status code: \(statusCode)")
                 } else {
-                    print("!@ANALITIC ERROR in \(endpoint.rawValue): No status code")
+                    logger.error("NetworkService, \(#function),\(endpoint.rawValue): No status code")
                 }
             }
             
             task.resume()
         } catch {
-            print("!@ANALITIC ERROR in \(endpoint.rawValue): \(error.localizedDescription)")
+            logger.error("NetworkService, \(#function),in \(endpoint.rawValue): \(error.localizedDescription)")
         }
+    }
+    
+    static private var logger: Logger {
+        Tracker.logger
     }
 }
 
