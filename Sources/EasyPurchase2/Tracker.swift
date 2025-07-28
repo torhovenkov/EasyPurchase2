@@ -58,12 +58,18 @@ actor Tracker: TrackServiceProtocol {
             self.idfa = idfa
             self.vendorId = vendorId
             
-            let handleAttribution = await handleAttribution()
+            let records = await getAttributionRecords()
+            
+            var campaignId: String? = nil
+            
+            if let id = records?.campaignId {
+                campaignId = String(id)
+            }
             
             let userSetups = UserSetups(
-                attribution: handleAttribution?.attrubution,
-                campaignId: handleAttribution?.campaignId,
-                campaignRegion: handleAttribution?.campaignRegion,
+                attribution: records?.attribution,
+                campaignId: campaignId,
+                campaignRegion: records?.countryOrRegion,
                 appBundleId: Bundle.main.bundleIdentifier ?? "",
                 appUserId: self.appUserId,
                 idfa: idfa,
@@ -73,7 +79,8 @@ actor Tracker: TrackServiceProtocol {
                 iosVersion: systemVersion,
                 device: modelName,
                 locale: Locale.current.identifier,
-                countryCode: Locale.current.countryCode
+                countryCode: Locale.current.countryCode,
+                attributionRecords: records
             )
             
             send(userSetups, to: .configure)
@@ -132,13 +139,12 @@ actor Tracker: TrackServiceProtocol {
         allProducts.first(where: { $0.id == productId })
     }
     
-    private func handleAttribution() async -> UserAttribution? {
+    private func getAttributionRecords() async -> UserSetups.AttributionRecords? {
 #if targetEnvironment(simulator) || os(tvOS)
         return nil
 #endif
         
-        let attributionToken = try? AAAttribution.attributionToken()
-        guard let attributionToken else { return nil }
+        guard let attributionToken = try? AAAttribution.attributionToken() else { return nil }
         
         var request = URLRequest(url: URL(string:"https://api-adservices.apple.com/api/v1/")!)
         request.httpMethod = "POST"
@@ -146,24 +152,15 @@ actor Tracker: TrackServiceProtocol {
         request.httpBody = Data(attributionToken.utf8)
         
         do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .useDefaultKeys
             let (data, _) = try await URLSession.shared.data(for: request)
-            guard let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:Any],
-                  let attribution = result["attribution"] as? Bool,
-                  let campaignId = result["campaignId"] as? Int,
-                  let countryOrRegion = result["countryOrRegion"] as? String else {
-                logger.error("\(#function) downcasting error")
-                let stringData = String(data: data, encoding: .utf8)
-                logger.error("\(#function) data: \(stringData ?? "nil")")
-                
-                return nil
-            }
             
-            guard campaignId != 1234567890 else {
-                logger.error("\(#function) campaignId == 1234567890)")
-                return nil
-            }
+            let result = try decoder.decode(UserSetups.AttributionRecords.self, from: data)
             
-            return UserAttribution(attrubution: attribution, campaignId: String(campaignId), campaignRegion: countryOrRegion)
+            guard result.campaignId != 1234567890 else { return nil }
+            
+            return result
         } catch {
             logger.error("\(#function), error: \(error)")
             return nil
