@@ -140,31 +140,31 @@ actor Tracker: TrackServiceProtocol {
     }
     
     private func getAttributionRecords() async -> UserSetups.AttributionRecords? {
-#if targetEnvironment(simulator) || os(tvOS)
+#if os(tvOS) || targetEnvironment(simulator)
         return nil
-#endif
-        
+#else
         guard let attributionToken = try? AAAttribution.attributionToken() else { return nil }
-        
+
         var request = URLRequest(url: URL(string:"https://api-adservices.apple.com/api/v1/")!)
         request.httpMethod = "POST"
         request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(attributionToken.utf8)
-        
+
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .useDefaultKeys
             let (data, _) = try await URLSession.shared.data(for: request)
-            
+
             let result = try decoder.decode(UserSetups.AttributionRecords.self, from: data)
-            
+
             guard result.campaignId != 1234567890 else { return nil }
-            
+
             return result
         } catch {
             logger.error("\(#function), error: \(error)")
             return nil
         }
+#endif
     }
 }
 
